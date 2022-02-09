@@ -25,7 +25,7 @@ module.exports = function(context) {
             minifyJS: {
                 sourceMap: false
             },
-            minifyCSS: true
+            minifyCSS: false
         })).pipe(gulp.dest(platformWWW))
         .pipe(debug())
         .on('unpipe', function() {
