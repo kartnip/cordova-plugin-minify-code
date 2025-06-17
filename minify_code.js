@@ -16,7 +16,7 @@ module.exports = function(context) {
     }
     console.log('cordova-plugin-minify-code: Minify Target Directory: ' + platformWWW);
     console.log('cordova-plugin-minify-code: Task Start...');
-    return gulp.src(platformWWW + '/**/**/*').pipe(minify({
+    return gulp.src(platformWWW + '/*').pipe(minify({
             minify: true,
             minifyHTML: {
                 collapseWhitespace: true,
