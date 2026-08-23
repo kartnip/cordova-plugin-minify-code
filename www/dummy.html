@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html>
 
-<head>title>Dummy HTML</title>
-</head>
+<head><title>Dummy HTML</title></head>
 
 <body>
 
     <div id="dummy">dummmy</div>
-    <script src="dummy.css"></script>
+    <script src="dummy.js"></script>
+    <script>
+        var dummyInline = function () {
+            return 'inline';
+        };
+    </script>
+    <script type="text/ng-template" id="not-js">
+        <div>{{ this is not javascript, must stay untouched }}</div>
+    </script>
 </body>
 
 </html>

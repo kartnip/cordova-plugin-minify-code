@@ -1,1 +1,3 @@
-var dummy=function(){return!0};
+var dummy = function() {
+    return true;
+};
