@@ -70,11 +70,34 @@ function isJavaScriptType(attrs) {
 // produces code whose rotation loop never terminates — the app hangs on
 // load. This marker makes obfuscate() a no-op on code we've already
 // processed, so a stale re-run can't corrupt it.
-var OBFUSCATION_MARKER = '/* cordova-plugin-minify-code:done */';
+//
+// Every marker string this file has ever stamped onto obfuscated output,
+// oldest first — obfuscate() treats a match against ANY of these as
+// "already done". A leftover platforms/.../www file built before a purely
+// cosmetic wording change to the marker still needs to be recognized as
+// processed; recognizing only the current exact string is what let a
+// wording change re-trigger the double-obfuscation hang this marker exists
+// to prevent. To change the marker's text, PUSH A NEW ENTRY rather than
+// editing an existing one in place — editing history instead of appending
+// to it reproduces exactly that bug.
+var OBFUSCATION_MARKERS = [
+    '/* cordova-plugin-minify-code:done */',
+    '/* Copyright blah blah all rights whatever Jeffrey Reisberg, Kartnip, Petrol Avengers LLC */',
+    '/* Copyright Jeffrey Reisberg, Kartnip, Petrol Avengers LLC, All Rights Reserved */'
+];
+// The one stamped onto newly-obfuscated output going forward — always the
+// most recent entry above.
+var OBFUSCATION_MARKER = OBFUSCATION_MARKERS[OBFUSCATION_MARKERS.length - 1];
+
+function alreadyObfuscated(code) {
+    return OBFUSCATION_MARKERS.some(function (marker) {
+        return code.indexOf(marker) === 0;
+    });
+}
 
 function obfuscate(code, label) {
     if (!code || !code.trim()) return code;
-    if (code.indexOf(OBFUSCATION_MARKER) === 0) return code;
+    if (alreadyObfuscated(code)) return code;
     try {
         var obfuscated = JavaScriptObfuscator.obfuscate(code, OBFUSCATOR_OPTIONS).getObfuscatedCode();
         return OBFUSCATION_MARKER + obfuscated;
