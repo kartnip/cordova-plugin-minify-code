@@ -59,10 +59,25 @@ function isJavaScriptType(attrs) {
     );
 }
 
+// Marks code we've already obfuscated. `after_prepare` re-runs on every
+// `cordova prepare`, but Cordova only re-copies a file from the pristine
+// www/ source into platforms/.../www when it thinks the source changed —
+// an unchanged source can be left in place across an incremental build,
+// so this hook can see the *already-obfuscated* platform copy again.
+// Feeding javascript-obfuscator's own output back into itself is not
+// safe to do: the string-array bootstrap it injects assumes it's
+// rotating a table it built itself, and obfuscating that a second time
+// produces code whose rotation loop never terminates — the app hangs on
+// load. This marker makes obfuscate() a no-op on code we've already
+// processed, so a stale re-run can't corrupt it.
+var OBFUSCATION_MARKER = '/* cordova-plugin-minify-code:done */';
+
 function obfuscate(code, label) {
     if (!code || !code.trim()) return code;
+    if (code.indexOf(OBFUSCATION_MARKER) === 0) return code;
     try {
-        return JavaScriptObfuscator.obfuscate(code, OBFUSCATOR_OPTIONS).getObfuscatedCode();
+        var obfuscated = JavaScriptObfuscator.obfuscate(code, OBFUSCATOR_OPTIONS).getObfuscatedCode();
+        return OBFUSCATION_MARKER + obfuscated;
     } catch (err) {
         console.warn('cordova-plugin-minify-code: failed to obfuscate ' + label + ', leaving it as-is: ' + err.message);
         return code;
