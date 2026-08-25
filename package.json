@@ -23,6 +23,7 @@
     },
     "homepage": "https://github.com/sakaitaka/cordova-plugin-minify-code#readme",
     "dependencies": {
+        "acorn": "^8.11.0",
         "html-minifier-terser": "^7.2.0",
         "javascript-obfuscator": "^5.6.0"
     },
